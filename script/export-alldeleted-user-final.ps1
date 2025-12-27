@@ -14,6 +14,33 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : Export-EntraDeletedUsers" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [Id]
+                     [UserPrincipalName]
+                     [DisplayName]
+                     [AccountEnabled]
+                     [DeletedDateTime]
+                     [DeletionAgeInDays]
+                     [UserType]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil daftar pengguna yang telah dihapus dari Microsoft Entra ID, menampilkan progres eksekusi di konsol, serta mengekspor hasil detail (termasuk informasi UPN, nama tampilan, status akun, tanggal penghapusan, usia penghapusan, dan tipe user) ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
+
 ## -----------------------------------------------------------------------
 ## 2. KONEKSI WAJIB (MICROSOFT ENTRA)
 ## -----------------------------------------------------------------------

@@ -1,11 +1,11 @@
 # =========================================================================
 # FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V2.0)
-# Nama Skrip: Get-EntraIdentityProviders-Lite
-# Deskripsi: Mengambil daftar penyedia identitas tanpa ClientId.
+# Nama Skrip: Get-EntraPartnerInformation_Custom
+# Deskripsi: Menarik informasi partner dengan format output spesifik.
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "GetEntraIdentityProvider" 
+$scriptName = "EntraPartnerCustom" 
 $scriptOutput = New-Object System.Collections.Generic.List[PSCustomObject]
 
 # Tentukan jalur dan nama file output dinamis
@@ -14,28 +14,6 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
-# ==========================================================
-#                INFORMASI SCRIPT                
-# ==========================================================
-Write-Host "`n================================================" -ForegroundColor Yellow
-Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
-Write-Host "================================================" -ForegroundColor Yellow
-Write-Host " Nama Skrip        : Get-EntraIdentityProviders-Lite" -ForegroundColor Yellow
-Write-Host " Field Kolom       : [Id]
-                     [Name]
-                     [Type]" -ForegroundColor Yellow
-Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil daftar penyedia identitas (Identity Providers) dari Microsoft Entra ID tanpa menampilkan ClientId, kemudian mengekspor hasilnya ke file CSV." -ForegroundColor Cyan
-Write-Host "==========================================================" -ForegroundColor Yellow
-
-# ==========================================================
-# KONFIRMASI EKSEKUSI
-# ==========================================================
-$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
-
-if ($confirmation -ne "Y") {
-    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
-    return
-}
 
 ## -----------------------------------------------------------------------
 ## 1. PRASYARAT DAN INSTALASI MODUL
@@ -77,7 +55,7 @@ Write-Host "`n--- 2. Membangun Koneksi ke Microsoft Entra ---" -ForegroundColor 
 
 try {
     Write-Host "Menghubungkan ke Microsoft Entra..." -ForegroundColor Yellow
-    Connect-Entra -Scopes 'IdentityProvider.Read.All' -ErrorAction Stop
+    Connect-Entra -Scopes 'Organization.Read.All' -ErrorAction Stop
     Write-Host "Koneksi ke Microsoft Entra berhasil dibuat." -ForegroundColor Green
 } catch {
     Write-Error "Gagal terhubung ke Microsoft Entra. $($_.Exception.Message)"
@@ -91,31 +69,32 @@ try {
 Write-Host "`n--- 3. Memulai Logika Utama Skrip: $($scriptName) ---" -ForegroundColor Magenta
 
 try {
-    Write-Host "Mengambil data Identity Providers..." -ForegroundColor Cyan
-    $providers = Get-EntraIdentityProvider -ErrorAction Stop
+    Write-Host "Mengambil data Partner Information..." -ForegroundColor Cyan
     
-    if ($providers) {
-        $total = $providers.Count
-        $counter = 0
-
-        foreach ($idp in $providers) {
-            $counter++
-            Write-Host "`r-> [$counter/$total] Memproses: $($idp.DisplayName) . . ." -ForegroundColor Green -NoNewline
+    $partners = Get-EntraPartnerInformation -ErrorAction Stop
+    
+    if ($null -ne $partners) {
+        foreach ($partner in $partners) {
+            Write-Host "-> Menemukan Partner: $($partner.DisplayName)" -ForegroundColor Green
             
-            # ClientId telah dihapus dari objek hasil
+            # Format output sesuai permintaan user
             $obj = [PSCustomObject]@{
-                Id          = $idp.Id
-                Name        = $idp.DisplayName
-                Type        = $idp.Type
+                PartnerCompanyName       = $partner.DisplayName
+                companyType              = "" # Kosong sesuai contoh
+                PartnerSupportTelephones = "{$(($partner.SupportTelephones -join ', '))}"
+                PartnerSupportEmails     = "{$(($partner.SupportEmails -join ', '))}"
+                PartnerHelpUrl           = $partner.HelpUrl
+                PartnerCommerceUrl       = "" # Kosong sesuai contoh
+                ObjectID                 = $partner.Id
+                PartnerSupportUrl        = "" # Kosong sesuai contoh
             }
             $scriptOutput.Add($obj)
         }
-        Write-Host "`n`nData berhasil dikumpulkan." -ForegroundColor Green
     } else {
-        Write-Host "`nTidak ditemukan Identity Provider eksternal." -ForegroundColor Yellow
+        Write-Host "Tidak ada data partner ditemukan." -ForegroundColor Yellow
     }
 } catch {
-    Write-Error "Terjadi kesalahan saat mengambil data: $($_.Exception.Message)"
+    Write-Error "Terjadi kesalahan: $($_.Exception.Message)"
 }
 
 ## -----------------------------------------------------------------------
@@ -125,8 +104,9 @@ try {
 Write-Host "`n--- 4. Cleanup, Memutus Koneksi, dan Ekspor Hasil ---" -ForegroundColor Blue
 
 if ($scriptOutput.Count -gt 0) {
-    Write-Host "Mengekspor $($scriptOutput.Count) baris data hasil skrip..." -ForegroundColor Yellow
+    Write-Host "Mengekspor data ke CSV..." -ForegroundColor Yellow
     try {
+        # Menggunakan pemisah semicolon (;) sesuai framework sebelumnya
         $scriptOutput | Export-Csv -Path $outputFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8 -ErrorAction Stop
         Write-Host " Data berhasil diekspor ke: $outputFilePath" -ForegroundColor Green
     }

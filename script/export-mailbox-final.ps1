@@ -1,23 +1,3 @@
-<#
-.SYNOPSIS
-Mengekspor daftar semua Mailbox Exchange Online ke file CSV.
-
-.DESCRIPTION
-Skrip ini menggunakan Get-Mailbox untuk mengambil semua mailbox pengguna. Skrip ini akan MELEWATI koneksi jika sesi Exchange Online sudah aktif, dan yang PALING PENTING: TIDAK AKAN MEMUTUSKAN koneksi di akhir skrip (Bagian 4.2) sehingga sesi tetap aktif untuk skrip selanjutnya.
-
-.AUTHOR
-AI PowerShell Expert
-
-.VERSION
-3.3 (Export All Mailboxes to CSV - PERSISTENT SESSION)
-
-.PREREQUISITES
-Membutuhkan koneksi internet. Akun yang digunakan harus memiliki izin yang cukup untuk mengakses Exchange Online.
-
-.NOTES
-Output file akan disimpan di direktori yang sama dengan skrip ini, dengan nama Output_ExportAllMailboxesToCSV_[Timestamp].csv.
-Koneksi ke Exchange Online AKAN TETAP AKTIF setelah skrip selesai.
-#>
 # =========================================================================
 # FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V3.3)
 # Menyimpan output skrip ke file CSV dinamis di folder skrip.
@@ -36,6 +16,28 @@ $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $scriptDir = if ($PSScriptRoot) {$PSScriptRoot} else {(Get-Location).Path}
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : ExportAllMailboxesToCSV" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [DisplayName]
+                     [SamAccountName]
+                     [PrimarySmtpAddress]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil semua mailbox pengguna dari Exchange Online, termasuk informasi DisplayName, SamAccountName, dan Primary SMTP Address. Hasil laporan ditampilkan di konsol dan diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 3. LOGIKA UTAMA SCRIPT ANDA DI SINI

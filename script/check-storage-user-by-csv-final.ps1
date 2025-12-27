@@ -1,10 +1,3 @@
-<#
-.SYNOPSIS
-Membuat laporan detail penggunaan storage mailbox berdasarkan daftar email dari file CSV TANPA HEADER.
-.DESCRIPTION
-Skrip dimodifikasi untuk membaca file CSV yang langsung berisi data email di baris pertama.
-#>
-
 # =========================================================================
 # FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V5.1 - No Header)
 # =========================================================================
@@ -22,6 +15,35 @@ $inputFilePath = Join-Path -Path $scriptDir -ChildPath $inputFileName
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_${scriptName}_${timestamp}.csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
+
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : MailboxStorageReport" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [UserPrincipalName]
+                     [DisplayName]
+                     [TotalItemSizeGB]
+                     [ItemCount]
+                     [WarningQuota]
+                     [SendQuota]
+                     [LastLogonTime]
+                     [Status]
+                     [Reason]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk membuat laporan penggunaan storage mailbox berdasarkan daftar UPN dari file CSV tanpa header. Script akan memvalidasi mailbox, mengambil statistik ukuran, jumlah item, kuota peringatan dan kuota kirim, serta waktu logon terakhir, kemudian mengekspor hasil ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 3. LOGIKA UTAMA SCRIPT

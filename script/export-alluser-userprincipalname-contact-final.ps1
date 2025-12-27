@@ -14,6 +14,28 @@ $scriptDir = if ($PSScriptRoot) {$PSScriptRoot} else {(Get-Location).Path}
 $outputFileName = "Output_${scriptName}_${timestamp}.csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : AllActiveUsersContactReport" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [DisplayName]
+                     [UserPrincipalName]
+                     [Contact]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil data seluruh pengguna aktif, termasuk DisplayName, UserPrincipalName, dan informasi kontak (BusinessPhones serta MobilePhone). Hasil laporan ditampilkan di konsol dengan progres bar dan diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 2. PRASYARAT DAN KONEKSI

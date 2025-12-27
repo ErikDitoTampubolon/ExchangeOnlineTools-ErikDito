@@ -1,12 +1,12 @@
 # =========================================================================
-# FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V2.1)
-# Nama Skrip: Export-EntraInactiveGuestUsers
-# Deskripsi: Mengambil daftar Guest User yang tidak aktif > 30 hari.
+# FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V2.0)
+# Nama Skrip: Get-EntraDomainsReport
+# Deskripsi: Mengambil daftar domain dan status verifikasinya dari Entra ID.
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "ExportEntraInactiveGuestUsers" 
-$scriptOutput = [System.Collections.ArrayList]::new() 
+$scriptName = "GetEntraDomains" 
+$scriptOutput = New-Object System.Collections.Generic.List[PSCustomObject]
 
 # Tentukan jalur dan nama file output dinamis
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
@@ -14,22 +14,20 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
-
 # ==========================================================
 #                INFORMASI SCRIPT                
 # ==========================================================
 Write-Host "`n================================================" -ForegroundColor Yellow
 Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
 Write-Host "================================================" -ForegroundColor Yellow
-Write-Host " Nama Skrip        : Export-EntraInactiveGuestUsers" -ForegroundColor Yellow
-Write-Host " Field Kolom       : [DisplayName]
-                     [UserPrincipalName]
-                     [UserType]
-                     [AccountEnabled]
-                     [LastSignInDateTime]
-                     [LastNonInteractiveSignIn]
-                     [Id]" -ForegroundColor Yellow
-Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil daftar Guest User di Microsoft Entra ID yang tidak aktif lebih dari 30 hari. Laporan mencakup informasi DisplayName, UPN, tipe user, status akun, serta detail aktivitas sign-in terakhir. Hasil laporan ditampilkan di konsol dengan progres bar dan diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host " Nama Skrip        : Get-EntraDomainsReport" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [DomainName]
+                     [IsDefault]
+                     [IsVerified]
+                     [Status]
+                     [Authentication]
+                     [IsAdminManaged]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil daftar domain dari Microsoft Entra ID beserta status verifikasi, tipe autentikasi, dan atribut pengelolaan admin, lalu mengekspor hasilnya ke file CSV." -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Yellow
 
 # ==========================================================
@@ -55,7 +53,7 @@ try {
     Disconnect-Entra -ErrorAction SilentlyContinue
     
     # Koneksi utama
-    Connect-Entra -Scopes 'AuditLog.Read.All','User.Read.All' -ErrorAction Stop
+    Connect-Entra -Scopes 'Domain.Read.All' -ErrorAction Stop
     Write-Host "Koneksi ke Microsoft Entra berhasil dibuat." -ForegroundColor Green
 } catch {
     Write-Error "Gagal terhubung: $($_.Exception.Message)"
@@ -70,39 +68,32 @@ try {
 Write-Host "`n--- 3. Memulai Logika Utama Skrip: $($scriptName) ---" -ForegroundColor Magenta
 
 try {
-    Write-Host "Menganalisis seluruh pengguna yang tidak aktif > 30 hari..." -ForegroundColor Cyan
+    Write-Host "Mengambil data Domain..." -ForegroundColor Cyan
+    $domains = Get-EntraDomain -ErrorAction Stop
     
-    # Menjalankan logika utama: Get-EntraInactiveSignInUser -LastSignInBeforeDaysAgo 30 -All
-    $inactiveUsers = Get-EntraInactiveSignInUser -LastSignInBeforeDaysAgo 30 -All -ErrorAction Stop
-    $totalData = $inactiveUsers.Count
-    
-    if ($totalData -gt 0) {
-        $i = 0
-        foreach ($user in $inactiveUsers) {
-            $i++
+    if ($domains) {
+        $total = $domains.Count
+        $counter = 0
+
+        foreach ($domain in $domains) {
+            $counter++
+            Write-Host "`r-> [$counter/$total] Memproses: $($domain.Id) . . ." -ForegroundColor Green -NoNewline
             
-            # Output progres baris tunggal (UI Refresh) sesuai permintaan sebelumnya
-            $statusText = "-> [$i/$totalData] Memproses: $($user.UserPrincipalName) . . ."
-            Write-Host "`r$statusText" -ForegroundColor Green -NoNewline
-            
-            # Mapping data ke objek hasil untuk ekspor CSV
+            # Membuat objek data kustom
             $obj = [PSCustomObject]@{
-                DisplayName              = $user.DisplayName
-                UserPrincipalName        = $user.UserPrincipalName
-                UserType                 = $user.UserType
-                AccountEnabled           = $user.AccountEnabled
-                LastSignInDateTime       = $user.SignInActivity.LastSignInDateTime
-                LastNonInteractiveSignIn = $user.SignInActivity.LastNonInteractiveSignInDateTime
-                Id                       = $user.Id
+                DomainName     = $domain.Id
+                IsDefault      = $domain.IsDefault
+                IsVerified     = $domain.IsVerified
+                Status         = $domain.Status
+                Authentication = $domain.AuthenticationType
+                IsAdminManaged = $domain.IsAdminManaged
             }
-            [void]$scriptOutput.Add($obj)
+            $scriptOutput.Add($obj)
         }
-        Write-Host "`n`nBerhasil memproses $totalData pengguna tidak aktif." -ForegroundColor Green
-    } else {
-        Write-Host "Tidak ditemukan pengguna yang tidak aktif dalam 30 hari terakhir." -ForegroundColor Yellow
+        Write-Host "`n`nData domain berhasil dikumpulkan." -ForegroundColor Green
     }
 } catch {
-    Write-Error "Terjadi kesalahan saat mengambil data: $($_.Exception.Message)"
+    Write-Error "Terjadi kesalahan saat mengambil data domain: $($_.Exception.Message)"
 }
 
 ## -----------------------------------------------------------------------
@@ -113,22 +104,19 @@ Write-Host "`n--- 4. Cleanup, Memutus Koneksi, dan Ekspor Hasil ---" -Foreground
 
 # 4.1. Ekspor Hasil
 if ($scriptOutput.Count -gt 0) {
-    Write-Host "Mengekspor data ke file CSV..." -ForegroundColor Yellow
+    Write-Host "Mengekspor $($scriptOutput.Count) baris data hasil skrip..." -ForegroundColor Yellow
     try {
-        # Menggunakan titik koma (;) sebagai delimiter agar rapi saat dibuka di Excel
         $scriptOutput | Export-Csv -Path $outputFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8 -ErrorAction Stop
         Write-Host " Data berhasil diekspor ke: $outputFilePath" -ForegroundColor Green
     }
     catch {
         Write-Error "Gagal mengekspor data ke CSV: $($_.Exception.Message)"
     }
-} else {
-    Write-Host " Tidak ada data yang dikumpulkan. Melewati ekspor." -ForegroundColor DarkYellow
 }
 
 # 4.2. Memutus koneksi Entra
 Write-Host "Memutuskan koneksi dari Microsoft Entra..." -ForegroundColor DarkYellow
 Disconnect-Entra -ErrorAction SilentlyContinue
-Write-Host " Sesi telah ditutup." -ForegroundColor Green
+Write-Host " Sesi Microsoft Entra diputus." -ForegroundColor Green
 
 Write-Host "`nSkrip $($scriptName) selesai dieksekusi." -ForegroundColor Yellow

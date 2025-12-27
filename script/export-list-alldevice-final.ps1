@@ -13,6 +13,28 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $PSScriptRoot -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : Export-DuplicateEntraDevices" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [DeviceName]
+                     [OperatingSystem]
+                     [Count]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengidentifikasi perangkat di Microsoft Entra ID yang memiliki nama duplikat. Hasil laporan menampilkan nama perangkat, sistem operasi, serta jumlah duplikat, kemudian diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 2. KONEKSI WAJIB (MICROSOFT ENTRA)

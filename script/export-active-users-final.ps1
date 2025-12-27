@@ -29,6 +29,36 @@ function CheckAndInstallModule {
 
 CheckAndInstallModule -ModuleName "Microsoft.Graph" 
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : ExportActiveUsersContactReport" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [UserPrincipalName]
+                     [DisplayName]
+                     [EmailAddress]
+                     [OfficePhone]
+                     [MobilePhone]
+                     [JobTitle]
+                     [Department]
+                     [UsageLocation]
+                     [LicenseSKUs]
+                     [AccountCreatedDate]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk membuat laporan detail semua pengguna aktif di Microsoft Entra ID, termasuk informasi kontak (nomor telepon kantor dan mobile), email, jabatan, departemen, lokasi penggunaan, lisensi yang dimiliki, serta tanggal pembuatan akun. Hasil laporan diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
+
 ## -----------------------------------------------------------------------
 ## 2. KONEKSI WAJIB (MICROSOFT GRAPH)
 ## -----------------------------------------------------------------------

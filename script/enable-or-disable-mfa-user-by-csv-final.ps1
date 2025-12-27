@@ -16,6 +16,32 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : Bulk-MFA-Manager-NoHeader" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [Timestamp]
+                     [UserAccount]
+                     [Operation]
+                     [Status]
+                     [Message]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengelola status MFA (Enable/Disable) secara massal berdasarkan daftar UPN dari file CSV tanpa header. Script akan memvalidasi format UPN, menampilkan progres eksekusi di konsol, serta mengekspor hasil detail ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
+
 ## -----------------------------------------------------------------------
 ## 2. PEMILIHAN OPERASI & KONEKSI
 ## -----------------------------------------------------------------------

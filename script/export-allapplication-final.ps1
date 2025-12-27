@@ -14,6 +14,33 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : Export-AllAppsOwnersReport" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [ApplicationName]
+                     [ApplicationId]
+                     [OwnerObjectId]
+                     [OwnerDisplayName]
+                     [UserPrincipalName]
+                     [CreatedDateTime]
+                     [UserType]
+                     [AccountEnabled]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil daftar semua aplikasi di Microsoft Entra ID beserta informasi pemiliknya (owners). Jika aplikasi tidak memiliki owner, data tetap dicatat dengan keterangan kosong. Hasil laporan diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 2. KONEKSI WAJIB (MICROSOFT ENTRA)

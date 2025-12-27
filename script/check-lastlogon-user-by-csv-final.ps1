@@ -23,6 +23,31 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_${scriptName}_${timestamp}.csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : MailboxLastLogonReport" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [UserPrincipalName]
+                     [DisplayName]
+                     [LastLogonTime]
+                     [Status]
+                     [Reason]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk membuat laporan tanggal Last Logon kotak surat berdasarkan daftar email dari file CSV tanpa header, memvalidasi keberadaan mailbox, menampilkan progres eksekusi di konsol, serta mengekspor hasil ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
+
 ## -----------------------------------------------------------------------
 ## 3. LOGIKA UTAMA SCRIPT
 ## -----------------------------------------------------------------------

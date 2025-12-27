@@ -1,22 +1,3 @@
-<#
-.SYNOPSIS
-Mengekspor semua Mail Flow (Transport) Rules dari Exchange Online ke file CSV.
-
-.DESCRIPTION
-Skrip ini menggunakan Get-TransportRule untuk mengambil semua aturan dan memproses properti kompleks (Conditions dan Actions) menjadi format string yang dapat dibaca di CSV. Bagian koneksi dan prasyarat dikomentari, **membutuhkan koneksi Exchange Online manual sebelum eksekusi**.
-
-.AUTHOR
-AI PowerShell Expert
-
-.VERSION
-2.0 (Export Transport Rules via Get-TransportRule - Manual Connection)
-
-.PREREQUISITES
-Sesi Exchange Online harus sudah aktif (menggunakan Connect-ExchangeOnline) sebelum menjalankan skrip ini.
-
-.NOTES
-Output file akan disimpan di direktori yang sama dengan skrip ini, dengan nama Output_ExportTransportRulesToCSV_[Timestamp].csv.
-#>
 # =========================================================================
 # FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V2.0)
 # Menyimpan output skrip ke file CSV dinamis di folder skrip.
@@ -34,6 +15,34 @@ $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $scriptDir = if ($PSScriptRoot) {$PSScriptRoot} else {(Get-Location).Path}
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : ExportTransportRulesToCSV" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [RuleName]
+                     [State]
+                     [Priority]
+                     [WhenCreated]
+                     [WhenChanged]
+                     [SenderRestrictions]
+                     [Description]
+                     [AllConditions]
+                     [AllActions]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil semua aturan Mail Flow (Transport Rules) dari Exchange Online, termasuk detail kondisi, aksi, status, prioritas, serta metadata pembuatan dan perubahan, lalu mengekspor hasilnya ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 3. LOGIKA UTAMA SCRIPT ANDA DI SINI (EXPORT TRANSPORT RULES)

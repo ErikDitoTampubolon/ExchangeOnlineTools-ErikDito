@@ -1,22 +1,3 @@
-<#
-.SYNOPSIS
-Mengekspor laporan kuota (Total, Terpakai, Tersedia) semua lisensi Microsoft 365 yang disubskripsikan menggunakan Microsoft Graph.
-
-.DESCRIPTION
-Skrip ini mengambil data Get-MgSubscribedSku, menghitung kuota yang tersedia untuk setiap jenis lisensi, dan menampilkan hasilnya di konsol dan mengekspornya ke CSV.
-
-.AUTHOR
-AI PowerShell Expert
-
-.VERSION
-1.0 (License Quota Report - Built on User Framework)
-
-.PREREQUISITES
-Modul Microsoft.Graph harus terinstal. Diperlukan koneksi internet dan akun administrator Microsoft 365 untuk login dengan scope 'Organization.Read.All'.
-
-.NOTES
-Output file akan disimpan di direktori yang sama dengan skrip ini, dengan nama Output_ExportLicenseQuotaReport_[Timestamp].csv.
-#>
 # =========================================================================
 # FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V2.0)
 # Menyimpan output skrip ke file CSV dinamis di folder skrip.
@@ -34,6 +15,32 @@ $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 # Penanganan kasus $PSScriptRoot tidak ada saat dijalankan dari konsol
 $scriptDir = if ($PSScriptRoot) {$PSScriptRoot} else {(Get-Location).Path}
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
+
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : ExportLicenseQuotaReport" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [LicenseName]
+                     [SkuPartNumber]
+                     [CapabilityStatus]
+                     [TotalUnits]
+                     [ConsumedUnits]
+                     [AvailableUnits]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil detail semua lisensi (SKU) yang disubskripsikan dari Microsoft Graph, menghitung kuota total, jumlah yang terpakai, serta sisa lisensi yang tersedia, kemudian menampilkan hasil di konsol dan mengekspor laporan ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 3. LOGIKA UTAMA SCRIPT ANDA DI SINI

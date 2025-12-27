@@ -14,6 +14,33 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : Export-AllUserOwnedDevice" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [UserPrincipalName]
+                     [UserDisplayName]
+                     [DeviceDisplayName]
+                     [DeviceId]
+                     [OperatingSystem]
+                     [OSVersion]
+                     [AccountEnabled]
+                     [TrustType]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengekspor daftar semua perangkat yang dimiliki oleh setiap pengguna di Microsoft Entra ID. Laporan mencakup informasi pengguna (UPN, DisplayName) serta detail perangkat (nama, ID, OS, versi, status akun, dan jenis trust). Hasil laporan ditampilkan di konsol dengan progres bar dan diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 2. KONEKSI WAJIB (MICROSOFT ENTRA)

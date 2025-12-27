@@ -13,6 +13,31 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $PSScriptRoot -ChildPath $outputFileName
 
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : Get-EntraAuthorizationPolicies" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [Id]
+                     [DisplayName]
+                     [Description]
+                     [AllowUserConsentForApp]
+                     [BlockMsolIdp]
+                     [DefaultUserRolePermissions]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil detail kebijakan otorisasi dari Microsoft Entra ID, termasuk informasi nama kebijakan, deskripsi, pengaturan consent aplikasi, blok MSOL IdP, serta default user role permissions, kemudian mengekspor hasilnya ke file CSV." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
+
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
+
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
+}
 
 ## -----------------------------------------------------------------------
 ## 1. PRASYARAT DAN INSTALASI MODUL

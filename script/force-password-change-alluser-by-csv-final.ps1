@@ -16,22 +16,30 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
-## -----------------------------------------------------------------------
-## 1. PRASYARAT DAN INSTALASI MODUL
-## -----------------------------------------------------------------------
+# ==========================================================
+#                INFORMASI SCRIPT                
+# ==========================================================
+Write-Host "`n================================================" -ForegroundColor Yellow
+Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Yellow
+Write-Host " Nama Skrip        : Bulk-EntraPasswordReset-AutoGenerate" -ForegroundColor Yellow
+Write-Host " Field Kolom       : [Timestamp]
+                     [UserPrincipalName]
+                     [TemporaryPassword]
+                     [Status]
+                     [Message]" -ForegroundColor Yellow
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk melakukan reset password massal pada pengguna Microsoft Entra ID dengan password acak yang digenerate otomatis oleh sistem. Password baru dicatat dalam laporan CSV bersama status eksekusi dan pesan hasil." -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor Yellow
 
-Write-Host "--- 1. Memeriksa Lingkungan PowerShell ---" -ForegroundColor Blue
+# ==========================================================
+# KONFIRMASI EKSEKUSI
+# ==========================================================
+$confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
 
-function CheckAndInstallModule {
-    param([string]$ModuleName)
-    Write-Host "1.$(++$global:moduleStep). Memeriksa Modul '$ModuleName'..." -ForegroundColor Cyan
-    if (!(Get-Module -Name $ModuleName -ListAvailable)) {
-        Install-Module -Name $ModuleName -Force -AllowClobber -Scope CurrentUser -ErrorAction Stop
-    }
+if ($confirmation -ne "Y") {
+    Write-Host "`nEksekusi skrip dibatalkan oleh pengguna." -ForegroundColor Red
+    return
 }
-
-$global:moduleStep = 1
-CheckAndInstallModule -ModuleName "Microsoft.Entra"
 
 ## -----------------------------------------------------------------------
 ## 2. FUNGSI GENERATOR PASSWORD & KONEKSI
