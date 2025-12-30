@@ -145,7 +145,7 @@ if (-not (Test-Path -Path $inputFilePath)) {
 ## -----------------------------------------------------------------------
 ## 4. EKSPOR HASIL
 ## -----------------------------------------------------------------------
-if ($allResults.Count -gt 0) {
+if ($scriptOutput.Count -gt 0) {
     # 1. Tentukan nama folder
     $exportFolderName = "exported_data"
     
@@ -167,7 +167,7 @@ if ($allResults.Count -gt 0) {
     $resultsFilePath = Join-Path -Path $exportFolderPath -ChildPath $outputFileName
     
     # 6. Ekspor data
-    $allResults | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
+    $scriptOutput | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
     
     Write-Host "`nSemua proses selesai!" -ForegroundColor Green
     Write-Host "Laporan tersimpan di: ${resultsFilePath}" -ForegroundColor Cyan
