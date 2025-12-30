@@ -1,5 +1,5 @@
 # =========================================================================
-# LISENSI MICROSOFT GRAPH ASSIGNMENT/REMOVAL SCRIPT V19.6
+# LISENSI MICROSOFT GRAPH ASSIGNMENT/REMOVAL SCRIPT V19.3 (Final Stability)
 # AUTHOR: Erik Dito Tampubolon - TelkomSigma
 # =========================================================================
 
@@ -7,8 +7,9 @@
 $inputFileName = "UserPrincipalName.csv"
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $inputFilePath = Join-Path -Path $scriptDir -ChildPath $inputFileName
-$defaultUsageLocation = 'ID'
 
+$defaultUsageLocation = 'ID'
+$operationType = "" 
 
 # ==========================================================
 #                INFORMASI SCRIPT                
@@ -34,25 +35,31 @@ if ($confirmation -ne "Y") {
     return
 }
 
+
 ## -----------------------------------------------------------------------
-## 2. KONEKSI KE MICROSOFT GRAPH
+## 2. KONEKSI KE MICROSOFT GRAPH (SILENT MODE)
 ## -----------------------------------------------------------------------
 $requiredScopes = "User.ReadWrite.All", "Organization.Read.All"
-Write-Host "`n--- 1. Memeriksa Koneksi ---" -ForegroundColor Blue
+Write-Host "`n--- 2. Membangun Koneksi ke Microsoft Graph ---" -ForegroundColor Blue
 
-if (-not (Get-MgContext -ErrorAction SilentlyContinue)) {
+if (Get-MgContext -ErrorAction SilentlyContinue) {
+    Write-Host "Sesi Microsoft Graph aktif." -ForegroundColor Green
+} else {
     Write-Host "Menghubungkan ke Microsoft Graph..." -ForegroundColor Cyan
-    Connect-MgGraph -Scopes $requiredScopes -ContextScope Process -ErrorAction Stop | Out-Null
+    try {
+        Connect-MgGraph -Scopes $requiredScopes -ErrorAction Stop | Out-Null
+        Write-Host "Koneksi Berhasil." -ForegroundColor Green
+    } catch {
+        Write-Error "Gagal terhubung ke Microsoft Graph."
+        return
+    }
 }
-Write-Host "Sesi Microsoft Graph Aktif." -ForegroundColor Green
 
 ## -----------------------------------------------------------------------
 ## 3. PEMILIHAN OPERASI DAN LISENSI 
 ## -----------------------------------------------------------------------
-Write-Host "`n--- 2. Pemilihan Operasi ---" -ForegroundColor Blue
-Write-Host "1. Assign License"
-Write-Host "2. Remove License"
-$operationChoice = Read-Host "Pilih nomor menu"
+Write-Host "`n--- 3. Pemilihan Operasi ---" -ForegroundColor Blue
+$operationChoice = Read-Host "Pilih operasi: (1) Assign License | (2) Remove License"
 
 switch ($operationChoice) {
     "1" { $operationType = "ASSIGN" }
@@ -82,28 +89,46 @@ try {
 }
 
 ## -----------------------------------------------------------------------
-## 5. LOGIKA UTAMA 
+## 4. PROSES LOGIKA UTAMA (CLEAN OUTPUT & FIXED INTERPOLATION)
 ## -----------------------------------------------------------------------
 $allResults = @()
 $timestamp = Get-Date -Format "yyyyMMdd_HHmm"
+
+if (-not (Test-Path -Path $inputFilePath)) {
+    Write-Host "File ${inputFileName} tidak ditemukan di ${scriptDir}!" -ForegroundColor Red
+    return
+}
+
+# Import CSV tanpa header
+$users = Import-Csv -Path $inputFilePath -Header "UserPrincipalName" -ErrorAction SilentlyContinue
+$totalUsers = $users.Count
 $userCount = 0 
 
-Write-Host "`n--- Memulai Proses Eksekusi ---" -ForegroundColor Magenta
+Write-Host "`n--- 4. Memproses ${totalUsers} Pengguna ---" -ForegroundColor Blue
 
 foreach ($entry in $users) {
     $userCount++
     $userUpn = if ($entry.UserPrincipalName) { $entry.UserPrincipalName.Trim() } else { $null }
     if ([string]::IsNullOrWhiteSpace($userUpn)) { continue }
 
-    Write-Host "-> [${userCount}/${totalUsers}] Memproses: ${userUpn} . . ." -ForegroundColor White
+    # FIX: Menggunakan ${} untuk menghindari error 'Variable reference is not valid'
+    Write-Progress -Activity "${operationType} License: ${skuPartNumberTarget}" `
+                   -Status "User ${userCount} of ${totalUsers}: ${userUpn}" `
+                   -PercentComplete ([int](($userCount / $totalUsers) * 100))
+    
+    Write-Host "-> [${userCount}/${totalUsers}] Memproses: ${userUpn}" -ForegroundColor White
 
     try {
+        # Ambil User dan simpan ke variabel (agar tidak tumpah ke layar)
         $user = Get-MgUser -UserId $userUpn -Property 'Id', 'DisplayName', 'UsageLocation' -ErrorAction Stop
         
+        # Penanganan UsageLocation
         if ($operationType -eq "ASSIGN" -and -not $user.UsageLocation) {
             $null = Update-MgUser -UserId $user.Id -UsageLocation $defaultUsageLocation -ErrorAction Stop
+            $user.UsageLocation = $defaultUsageLocation
         }
 
+        # Cek Lisensi
         $userLicense = Get-MgUserLicenseDetail -UserId $user.Id | Where-Object { $_.SkuId -eq $selectedLicense.SkuId }
 
         if ($operationType -eq "ASSIGN") {
@@ -123,24 +148,51 @@ foreach ($entry in $users) {
         }
 
         $allResults += [PSCustomObject]@{
-            UserPrincipalName = $userUpn; DisplayName = $user.DisplayName; Status = $status; Reason = $reason
+            UserPrincipalName = $userUpn
+            DisplayName       = $user.DisplayName
+            Status            = $status
+            Reason            = $reason
         }
     }
     catch {
-        Write-Host "   Gagal: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "Gagal: $($_.Exception.Message)" -ForegroundColor Red
         $allResults += [PSCustomObject]@{
-            UserPrincipalName = $userUpn; DisplayName = "Error"; Status = "FAIL"; Reason = $_.Exception.Message
+            UserPrincipalName = $userUpn
+            DisplayName       = "Error/Not Found"
+            Status            = "FAIL"
+            Reason            = $_.Exception.Message
         }
     }
 }
+Write-Progress -Activity "Selesai" -Completed
 
 ## -----------------------------------------------------------------------
-## 6. EKSPOR HASIL
+## 5. EKSPOR HASIL
 ## -----------------------------------------------------------------------
 if ($allResults.Count -gt 0) {
+    # 1. Tentukan nama folder
+    $exportFolderName = "exported_data"
+    
+    # 2. Ambil jalur dua tingkat di atas direktori skrip
+    # Contoh: Jika skrip di C:\Users\Erik\Project\Scripts, maka ini ke C:\Users\Erik\
+    $parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+    
+    # 3. Gabungkan menjadi jalur folder ekspor
+    $exportFolderPath = Join-Path -Path $parentDir -ChildPath $exportFolderName
+
+    # 4. Cek apakah folder 'exported_data' sudah ada di lokasi tersebut, jika belum buat baru
+    if (-not (Test-Path -Path $exportFolderPath)) {
+        New-Item -Path $exportFolderPath -ItemType Directory | Out-Null
+        Write-Host "`nFolder '$exportFolderName' berhasil dibuat di: $parentDir" -ForegroundColor Yellow
+    }
+
+    # 5. Tentukan nama file dan jalur lengkap
     $outputFileName = "${operationType}_License_Results_${timestamp}.csv"
-    $resultsFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
+    $resultsFilePath = Join-Path -Path $exportFolderPath -ChildPath $outputFileName
+    
+    # 6. Ekspor data
     $allResults | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
     
-    Write-Host "`nProses Selesai. Laporan: ${resultsFilePath}" -ForegroundColor Green
+    Write-Host "`nSemua proses selesai!" -ForegroundColor Green
+    Write-Host "Laporan tersimpan di: ${resultsFilePath}" -ForegroundColor Cyan
 }

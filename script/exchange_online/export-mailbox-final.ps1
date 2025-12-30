@@ -69,38 +69,33 @@ catch {
     }
 }
 
-# >>> AKHIR DARI KODE UTAMA SKRIP ANDA <<<
-
 ## -----------------------------------------------------------------------
-## 4. CLEANUP, DISCONNECT, DAN EKSPOR HASIL
+## 5. EKSPOR HASIL
 ## -----------------------------------------------------------------------
+if ($allResults.Count -gt 0) {
+    # 1. Tentukan nama folder
+    $exportFolderName = "exported_data"
+    
+    # 2. Ambil jalur dua tingkat di atas direktori skrip
+    # Contoh: Jika skrip di C:\Users\Erik\Project\Scripts, maka ini ke C:\Users\Erik\
+    $parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+    
+    # 3. Gabungkan menjadi jalur folder ekspor
+    $exportFolderPath = Join-Path -Path $parentDir -ChildPath $exportFolderName
 
-Write-Host "`n--- 4. Cleanup, Memutus Koneksi, dan Ekspor Hasil ---" -ForegroundColor Blue
-
-# 4.1. Ekspor Hasil
-if ($scriptOutput.Count -gt 0) {
-    Write-Host "Mengekspor $($scriptOutput.Count) baris data hasil skrip..." -ForegroundColor Yellow
-    try {
-        # Menggunakan Export-Csv ke $outputFilePath
-        $scriptOutput | Export-Csv -Path $outputFilePath -NoTypeInformation -Encoding UTF8 -Delimiter "," -ErrorAction Stop
-        Write-Host " Data berhasil diekspor ke:" -ForegroundColor Green
-        Write-Host " $outputFilePath" -ForegroundColor Green
+    # 4. Cek apakah folder 'exported_data' sudah ada di lokasi tersebut, jika belum buat baru
+    if (-not (Test-Path -Path $exportFolderPath)) {
+        New-Item -Path $exportFolderPath -ItemType Directory | Out-Null
+        Write-Host "`nFolder '$exportFolderName' berhasil dibuat di: $parentDir" -ForegroundColor Yellow
     }
-    catch {
-        Write-Error "Gagal mengekspor data ke CSV: $($_.Exception.Message)"
-    }
-} else {
-    Write-Host " Tidak ada data yang dikumpulkan (\$scriptOutput kosong). Melewati ekspor." -ForegroundColor DarkYellow
+
+    # 5. Tentukan nama file dan jalur lengkap
+    $outputFileName = "${operationType}_License_Results_${timestamp}.csv"
+    $resultsFilePath = Join-Path -Path $exportFolderPath -ChildPath $outputFileName
+    
+    # 6. Ekspor data
+    $allResults | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
+    
+    Write-Host "`nSemua proses selesai!" -ForegroundColor Green
+    Write-Host "Laporan tersimpan di: ${resultsFilePath}" -ForegroundColor Cyan
 }
-
-# 4.2. Memutus koneksi Exchange Online - BAGIAN INI DIKOMENTARI
-#         UNTUK MEMPERTAHANKAN SESI TETAP AKTIF DI POWERSHELL.
-if (Get-PSSession | Where-Object {$_.ConfigurationName -eq "Microsoft.Exchange"}) {
-#    Write-Host "Memutuskan koneksi dari Exchange Online..." -ForegroundColor DarkYellow
-#    Disconnect-ExchangeOnline -Confirm:$false -ErrorAction SilentlyContinue
-#    Write-Host " Koneksi Exchange Online diputus." -ForegroundColor Green
-    Write-Host " Koneksi Exchange Online dipertahankan agar skrip berikutnya tidak perlu login ulang." -ForegroundColor DarkYellow
-}
-
-
-Write-Host "`nSkrip $($scriptName) selesai dieksekusi." -ForegroundColor Yellow

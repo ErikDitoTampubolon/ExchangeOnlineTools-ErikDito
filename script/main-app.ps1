@@ -121,21 +121,23 @@ while ($mainRunning) {
                 Write-Host "  7. Export List Active User (UPN and Contact) by .csv"
                 Write-Host "  8. Export List Active User OneDrive Usage by .csv"
                 Write-Host "  9. Export List Active User Last Logon by .csv"
+                Write-Host "  10. Export List Mail Flow Rules"
                 Write-Host ""
                 Write-Host "  B. Kembali ke Menu Utama" -ForegroundColor Yellow
                 Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
                 
                 $subChoice = Read-Host "Pilih nomor menu"
                 if ($subChoice.ToUpper() -eq "B") { $subRunning = $false }
-                elseif ($subChoice -eq "1") { & (Join-Path $scriptDir "script\assign-or-remove-license-user-by-csv-final.ps1"); Pause }
-                elseif ($subChoice -eq "2") { & (Join-Path $scriptDir "script\check-license-name-and-quota-final.ps1"); Pause }
-                elseif ($subChoice -eq "3") { & (Join-Path $scriptDir "script\export-mailbox-final.ps1"); Pause }
-                elseif ($subChoice -eq "4") { & (Join-Path $scriptDir "script\export-active-users-final.ps1"); Pause }
-                elseif ($subChoice -eq "5") { & (Join-Path $scriptDir "script\export-alluser-userprincipalname-contact-final.ps1"); Pause }
-                elseif ($subChoice -eq "6") { & (Join-Path $scriptDir "script\check-lastpasswordchange-user-by-csv-final.ps1"); Pause }
-                elseif ($subChoice -eq "7") { & (Join-Path $scriptDir "script\export-userprincipalname-contact-by-csv-final.ps1"); Pause }
-                elseif ($subChoice -eq "8") { & (Join-Path $scriptDir "script\check-storage-user-by-csv-final.ps1"); Pause }
-                elseif ($subChoice -eq "9") { & (Join-Path $scriptDir "script\check-lastlogon-user-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "1") { & (Join-Path $scriptDir "script\exchange_online\assign-or-remove-license-user-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "2") { & (Join-Path $scriptDir "script\exchange_online\check-license-name-and-quota-final.ps1"); Pause }
+                elseif ($subChoice -eq "3") { & (Join-Path $scriptDir "script\exchange_online\export-mailbox-final.ps1"); Pause }
+                elseif ($subChoice -eq "4") { & (Join-Path $scriptDir "script\exchange_online\export-active-users-final.ps1"); Pause }
+                elseif ($subChoice -eq "5") { & (Join-Path $scriptDir "script\exchange_online\export-alluser-userprincipalname-contact-final.ps1"); Pause }
+                elseif ($subChoice -eq "6") { & (Join-Path $scriptDir "script\exchange_online\check-lastpasswordchange-user-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "7") { & (Join-Path $scriptDir "script\exchange_online\export-userprincipalname-contact-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "8") { & (Join-Path $scriptDir "script\exchange_online\check-storage-user-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "9") { & (Join-Path $scriptDir "script\exchange_online\check-lastlogon-user-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "10") { & (Join-Path $scriptDir "script\exchange_online\check-rules-final.ps1"); Pause }
             }
         }
         "2" { 
@@ -163,20 +165,20 @@ while ($mainRunning) {
                 
                 $subChoice = Read-Host "Pilih nomor menu"
                 if ($subChoice.ToUpper() -eq "B") { $subRunning = $false }
-		        elseif ($subChoice -eq "1") { & (Join-Path $scriptDir "script\enable-or-disable-mfa-user-by-csv-final.ps1"); Pause }
-		        elseif ($subChoice -eq "2") { & (Join-Path $scriptDir "script\force-password-change-alluser-by-csv-final.ps1"); Pause }
-                elseif ($subChoice -eq "3") { & (Join-Path $scriptDir "script\export-alluser-mfa-final.ps1"); Pause }
-                elseif ($subChoice -eq "4") { & (Join-Path $scriptDir "script\export-alldevice-final.ps1"); Pause }
-                elseif ($subChoice -eq "5") { & (Join-Path $scriptDir "script\export-alluser-owned-device-final.ps1"); Pause }
-                elseif ($subChoice -eq "6") { & (Join-Path $scriptDir "script\export-allapplication-final.ps1"); Pause }
-                elseif ($subChoice -eq "7") { & (Join-Path $scriptDir "script\export-alldeleted-user-final.ps1"); Pause }
-                elseif ($subChoice -eq "8") { & (Join-Path $scriptDir "script\export-alluser-inactive-30days-final.ps1"); Pause }
-                elseif ($subChoice -eq "9") { & (Join-Path $scriptDir "script\export-list-alldevice-final.ps1"); Pause }
-                elseif ($subChoice -eq "10") { & (Join-Path $scriptDir "script\check-conditional-access-policy-final.ps1"); Pause }
-                elseif ($subChoice -eq "11") { & (Join-Path $scriptDir "script\check-user-auth-method-final.ps1"); Pause }
-                elseif ($subChoice -eq "12") { & (Join-Path $scriptDir "script\check-permission-grant-policy-final.ps1"); Pause }
-                elseif ($subChoice -eq "13") { & (Join-Path $scriptDir "script\check-entra-auth-policy-final.ps1"); Pause }
-                elseif ($subChoice -eq "14") { & (Join-Path $scriptDir "script\check-entra-identity-provider-final.ps1"); Pause }
+		        elseif ($subChoice -eq "1") { & (Join-Path $scriptDir "script\entra\enable-or-disable-mfa-user-by-csv-final.ps1"); Pause }
+		        elseif ($subChoice -eq "2") { & (Join-Path $scriptDir "script\entra\force-password-change-alluser-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "3") { & (Join-Path $scriptDir "script\entra\export-alluser-mfa-final.ps1"); Pause }
+                elseif ($subChoice -eq "4") { & (Join-Path $scriptDir "script\entra\export-alldevice-final.ps1"); Pause }
+                elseif ($subChoice -eq "5") { & (Join-Path $scriptDir "script\entra\export-alluser-owned-device-final.ps1"); Pause }
+                elseif ($subChoice -eq "6") { & (Join-Path $scriptDir "script\entra\export-allapplication-final.ps1"); Pause }
+                elseif ($subChoice -eq "7") { & (Join-Path $scriptDir "script\entra\export-alldeleted-user-final.ps1"); Pause }
+                elseif ($subChoice -eq "8") { & (Join-Path $scriptDir "script\entra\export-alluser-inactive-30days-final.ps1"); Pause }
+                elseif ($subChoice -eq "9") { & (Join-Path $scriptDir "script\entra\export-list-alldevice-final.ps1"); Pause }
+                elseif ($subChoice -eq "10") { & (Join-Path $scriptDir "script\entra\check-conditional-access-policy-final.ps1"); Pause }
+                elseif ($subChoice -eq "11") { & (Join-Path $scriptDir "script\entra\check-user-auth-method-final.ps1"); Pause }
+                elseif ($subChoice -eq "12") { & (Join-Path $scriptDir "script\entra\check-permission-grant-policy-final.ps1"); Pause }
+                elseif ($subChoice -eq "13") { & (Join-Path $scriptDir "script\entra\check-entra-auth-policy-final.ps1"); Pause }
+                elseif ($subChoice -eq "14") { & (Join-Path $scriptDir "script\entra\check-entra-identity-provider-final.ps1"); Pause }
             }
         }
         "10" {

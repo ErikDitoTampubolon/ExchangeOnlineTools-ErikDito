@@ -135,16 +135,30 @@ if (-not (Test-Path -Path $inputFilePath)) {
 ## -----------------------------------------------------------------------
 ## 4. EKSPOR HASIL
 ## -----------------------------------------------------------------------
-
 if ($scriptOutput.Count -gt 0) {
-    Write-Host "`nMengekspor hasil..." -ForegroundColor Yellow
-    try {
-        $scriptOutput | Export-Csv -Path $outputFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
-        Write-Host "Data berhasil diekspor ke: $outputFilePath" -ForegroundColor Green
-    }
-    catch {
-        Write-Error "Gagal ekspor: $($_.Exception.Message)"
-    }
-}
+    # 1. Tentukan nama folder
+    $exportFolderName = "exported_data"
+    
+    # 2. Ambil jalur dua tingkat di atas direktori skrip
+    # Contoh: Jika skrip di C:\Users\Erik\Project\Scripts, maka ini ke C:\Users\Erik\
+    $parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+    
+    # 3. Gabungkan menjadi jalur folder ekspor
+    $exportFolderPath = Join-Path -Path $parentDir -ChildPath $exportFolderName
 
-Write-Host "`nSkrip ${scriptName} selesai." -ForegroundColor Yellow
+    # 4. Cek apakah folder 'exported_data' sudah ada di lokasi tersebut, jika belum buat baru
+    if (-not (Test-Path -Path $exportFolderPath)) {
+        New-Item -Path $exportFolderPath -ItemType Directory | Out-Null
+        Write-Host "`nFolder '$exportFolderName' berhasil dibuat di: $parentDir" -ForegroundColor Yellow
+    }
+
+    # 5. Tentukan nama file dan jalur lengkap
+    $outputFileName = "${operationType}_License_Results_${timestamp}.csv"
+    $resultsFilePath = Join-Path -Path $exportFolderPath -ChildPath $outputFileName
+    
+    # 6. Ekspor data
+    $scriptOutput | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
+    
+    Write-Host "`nSemua proses selesai!" -ForegroundColor Green
+    Write-Host "Laporan tersimpan di: ${resultsFilePath}" -ForegroundColor Cyan
+}

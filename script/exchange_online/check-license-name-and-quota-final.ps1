@@ -48,8 +48,6 @@ if ($confirmation -ne "Y") {
 
 Write-Host "`n--- 3. Memulai Logika Utama Skrip: $($scriptName) ---" -ForegroundColor Magenta
 
-# >>> GANTI BAGIAN INI DENGAN KODE UTAMA SKRIP ANDA <<<
-
 Write-Host "3.1. Mengambil detail semua Lisensi yang Disubskripsikan (SKU)..." -ForegroundColor Cyan
 
 try {
@@ -105,36 +103,33 @@ catch {
     }
 }
 
-# >>> AKHIR DARI KODE UTAMA SKRIP ANDA <<<
-
 ## -----------------------------------------------------------------------
-## 4. CLEANUP, DISCONNECT, DAN EKSPOR HASIL
+## 4. EKSPOR HASIL
 ## -----------------------------------------------------------------------
+if ($scriptOutput.Count -gt 0) {
+    # 1. Tentukan nama folder
+    $exportFolderName = "exported_data"
+    
+    # 2. Ambil jalur dua tingkat di atas direktori skrip
+    # Contoh: Jika skrip di C:\Users\Erik\Project\Scripts, maka ini ke C:\Users\Erik\
+    $parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+    
+    # 3. Gabungkan menjadi jalur folder ekspor
+    $exportFolderPath = Join-Path -Path $parentDir -ChildPath $exportFolderName
 
-Write-Host "`n--- 4. Cleanup, Memutus Koneksi, dan Ekspor Hasil ---" -ForegroundColor Blue
-
-# 4.1. Ekspor Hasil
-# Hanya ekspor jika ada data yang valid (bukan hanya error fatal)
-if ($scriptOutput.Count -gt 0 -and ($scriptOutput | Where-Object {$_.LicenseName -ne "FATAL ERROR"}).Count -gt 0) {
-    Write-Host "Mengekspor $($scriptOutput.Count) baris data hasil skrip..." -ForegroundColor Yellow
-    try {
-        $scriptOutput | Export-Csv -Path $outputFilePath -NoTypeInformation -Delimiter ";" -ErrorAction Stop
-        Write-Host " Data berhasil diekspor ke:" -ForegroundColor Green
-        Write-Host " $outputFilePath" -ForegroundColor Green
+    # 4. Cek apakah folder 'exported_data' sudah ada di lokasi tersebut, jika belum buat baru
+    if (-not (Test-Path -Path $exportFolderPath)) {
+        New-Item -Path $exportFolderPath -ItemType Directory | Out-Null
+        Write-Host "`nFolder '$exportFolderName' berhasil dibuat di: $parentDir" -ForegroundColor Yellow
     }
-    catch {
-        Write-Error "Gagal mengekspor data ke CSV: $($_.Exception.Message)"
-    }
-} else {
-    Write-Host "Tidak ada data lisensi valid yang dikumpulkan. Melewati ekspor." -ForegroundColor DarkYellow
-}
 
-# 4.2. Memutus koneksi Microsoft Graph
-# MODIFIKASI: Menggunakan Disconnect-MgGraph
-if (Get-MgContext -ErrorAction SilentlyContinue) {
-    Write-Host "Memutuskan koneksi dari Microsoft Graph..." -ForegroundColor DarkYellow
-    Disconnect-MgGraph -ErrorAction SilentlyContinue
-    Write-Host "Koneksi Microsoft Graph diputus." -ForegroundColor Green
+    # 5. Tentukan nama file dan jalur lengkap
+    $outputFileName = "${operationType}_License_Results_${timestamp}.csv"
+    $resultsFilePath = Join-Path -Path $exportFolderPath -ChildPath $outputFileName
+    
+    # 6. Ekspor data
+    $scriptOutput | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
+    
+    Write-Host "`nSemua proses selesai!" -ForegroundColor Green
+    Write-Host "Laporan tersimpan di: ${resultsFilePath}" -ForegroundColor Cyan
 }
-
-Write-Host "`nSkrip $($scriptName) selesai dieksekusi." -ForegroundColor Yellow

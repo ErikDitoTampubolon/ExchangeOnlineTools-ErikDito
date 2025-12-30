@@ -1,8 +1,3 @@
-<#
-.SYNOPSIS
-Membuat laporan tentang tanggal terakhir pengguna mengganti password berdasarkan daftar UPN dari file CSV TANPA HEADER.
-#>
-
 # =========================================================================
 # FRAMEWORK SCRIPT POWERSHELL DENGAN EKSPOR OTOMATIS (V2.3)
 # =========================================================================
@@ -60,7 +55,6 @@ if (-not (Get-MgContext -ErrorAction SilentlyContinue)) {
     }
 }
 
-
 ## -----------------------------------------------------------------------
 ## 3. LOGIKA UTAMA SCRIPT
 ## -----------------------------------------------------------------------
@@ -108,7 +102,7 @@ if (-not (Test-Path -Path $inputFilePath)) {
             }
         } 
         catch {
-            Write-Host "   ❌ Gagal mengambil data." -ForegroundColor Red
+            Write-Host "   Gagal mengambil data." -ForegroundColor Red
             $scriptOutput += [PSCustomObject]@{
                 UserPrincipalName = $upn; Status = "FAIL"; Reason = $_.Exception.Message
             }
@@ -116,19 +110,33 @@ if (-not (Test-Path -Path $inputFilePath)) {
     }
 }
 
-
-
 ## -----------------------------------------------------------------------
 ## 4. EKSPOR HASIL
 ## -----------------------------------------------------------------------
+if ($allResults.Count -gt 0) {
+    # 1. Tentukan nama folder
+    $exportFolderName = "exported_data"
+    
+    # 2. Ambil jalur dua tingkat di atas direktori skrip
+    # Contoh: Jika skrip di C:\Users\Erik\Project\Scripts, maka ini ke C:\Users\Erik\
+    $parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+    
+    # 3. Gabungkan menjadi jalur folder ekspor
+    $exportFolderPath = Join-Path -Path $parentDir -ChildPath $exportFolderName
 
-if ($scriptOutput.Count -gt 0) {
-    try {
-        $scriptOutput | Export-Csv -Path $outputFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
-        Write-Host "`n✅ Laporan Berhasil Diekspor: $outputFilePath" -ForegroundColor Cyan
-    } catch {
-        Write-Host "`n⚠️ Gagal mengekspor CSV." -ForegroundColor Yellow
+    # 4. Cek apakah folder 'exported_data' sudah ada di lokasi tersebut, jika belum buat baru
+    if (-not (Test-Path -Path $exportFolderPath)) {
+        New-Item -Path $exportFolderPath -ItemType Directory | Out-Null
+        Write-Host "`nFolder '$exportFolderName' berhasil dibuat di: $parentDir" -ForegroundColor Yellow
     }
-}
 
-Write-Host "`nSkrip Selesai." -ForegroundColor Yellow
+    # 5. Tentukan nama file dan jalur lengkap
+    $outputFileName = "${operationType}_License_Results_${timestamp}.csv"
+    $resultsFilePath = Join-Path -Path $exportFolderPath -ChildPath $outputFileName
+    
+    # 6. Ekspor data
+    $allResults | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
+    
+    Write-Host "`nSemua proses selesai!" -ForegroundColor Green
+    Write-Host "Laporan tersimpan di: ${resultsFilePath}" -ForegroundColor Cyan
+}

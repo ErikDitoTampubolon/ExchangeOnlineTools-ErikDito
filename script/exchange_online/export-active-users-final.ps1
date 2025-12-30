@@ -141,24 +141,33 @@ catch {
     Write-Error "Terjadi kesalahan: $($_.Exception.Message)"
 }
 
-
 ## -----------------------------------------------------------------------
-## 4. CLEANUP & EKSPOR
+## 4. EKSPOR HASIL
 ## -----------------------------------------------------------------------
+if ($allResults.Count -gt 0) {
+    # 1. Tentukan nama folder
+    $exportFolderName = "exported_data"
+    
+    # 2. Ambil jalur dua tingkat di atas direktori skrip
+    # Contoh: Jika skrip di C:\Users\Erik\Project\Scripts, maka ini ke C:\Users\Erik\
+    $parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+    
+    # 3. Gabungkan menjadi jalur folder ekspor
+    $exportFolderPath = Join-Path -Path $parentDir -ChildPath $exportFolderName
 
-Write-Host "`n--- 4. Ekspor Hasil ---" -ForegroundColor Blue
-
-if ($scriptOutput.Count -gt 0) {
-    try {
-        $scriptOutput | Export-Csv -Path $outputFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8 -ErrorAction Stop
-        Write-Host "Laporan Kontak berhasil disimpan: $outputFilePath" -ForegroundColor Green
+    # 4. Cek apakah folder 'exported_data' sudah ada di lokasi tersebut, jika belum buat baru
+    if (-not (Test-Path -Path $exportFolderPath)) {
+        New-Item -Path $exportFolderPath -ItemType Directory | Out-Null
+        Write-Host "`nFolder '$exportFolderName' berhasil dibuat di: $parentDir" -ForegroundColor Yellow
     }
-    catch { Write-Error "Gagal simpan CSV: $($_.Exception.Message)" }
-}
 
-if (Get-MgContext -ErrorAction SilentlyContinue) {
-    Disconnect-MgGraph -ErrorAction SilentlyContinue
-    Write-Host "Sesi Microsoft Graph diputus." -ForegroundColor Green
+    # 5. Tentukan nama file dan jalur lengkap
+    $outputFileName = "${operationType}_License_Results_${timestamp}.csv"
+    $resultsFilePath = Join-Path -Path $exportFolderPath -ChildPath $outputFileName
+    
+    # 6. Ekspor data
+    $allResults | Export-Csv -Path $resultsFilePath -NoTypeInformation -Delimiter ";" -Encoding UTF8
+    
+    Write-Host "`nSemua proses selesai!" -ForegroundColor Green
+    Write-Host "Laporan tersimpan di: ${resultsFilePath}" -ForegroundColor Cyan
 }
-
-Write-Host "`nSkrip Selesai." -ForegroundColor Yellow
