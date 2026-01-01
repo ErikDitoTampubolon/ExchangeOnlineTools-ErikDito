@@ -1,5 +1,5 @@
 # ==========================================================================
-# LISENSI MICROSOFT GRAPH ASSIGNMENT/REMOVAL SCRIPT V19.3 (Final Stability)
+# LISENSI MICROSOFT GRAPH ASSIGNMENT/REMOVAL SCRIPT V19.3
 # AUTHOR: Erik Dito Tampubolon
 # ==========================================================================
 
