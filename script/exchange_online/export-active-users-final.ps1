@@ -46,7 +46,7 @@ Write-Host " Field Kolom       : [UserPrincipalName]
                      [UsageLocation]
                      [LicenseSKUs]
                      [AccountCreatedDate]" -ForegroundColor Yellow
-Write-Host " Deskripsi Singkat : Script ini berfungsi untuk membuat laporan detail semua pengguna aktif di Microsoft Entra ID, termasuk informasi kontak (nomor telepon kantor dan mobile), email, jabatan, departemen, lokasi penggunaan, lisensi yang dimiliki, serta tanggal pembuatan akun. Hasil laporan diekspor otomatis ke file CSV." -ForegroundColor Cyan
+Write-Host " Deskripsi Singkat : Script ini berfungsi untuk membuat laporan detail semua pengguna aktif, termasuk informasi kontak (nomor telepon kantor dan mobile), email, jabatan, departemen, lokasi penggunaan, lisensi yang dimiliki, serta tanggal pembuatan akun. Hasil laporan diekspor otomatis ke file CSV." -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Yellow
 
 # ==========================================================
