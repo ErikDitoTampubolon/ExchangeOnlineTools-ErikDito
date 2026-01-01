@@ -5,7 +5,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "ExportEntraInactiveGuestUsers" 
+$scriptName = "InactiveGuestUsers30DaysReport" 
 $scriptOutput = [System.Collections.Generic.List[PSCustomObject]]::new() 
 
 # Tentukan jalur dan nama file output dinamis

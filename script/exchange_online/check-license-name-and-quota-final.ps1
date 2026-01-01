@@ -4,7 +4,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "ExportLicenseQuotaReport" 
+$scriptName = "LicenseQuotaReport" 
 $scriptOutput = @()
 
 # Tentukan jalur dan nama file output dinamis

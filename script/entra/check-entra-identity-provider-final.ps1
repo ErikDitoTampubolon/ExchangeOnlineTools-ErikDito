@@ -5,7 +5,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "GetEntraIdentityProvider" 
+$scriptName = "EntraIdentityProviderReport" 
 $scriptOutput = New-Object System.Collections.Generic.List[PSCustomObject]
 
 # Tentukan jalur dan nama file output dinamis

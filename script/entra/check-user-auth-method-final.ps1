@@ -5,7 +5,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "GetAuthMethods" 
+$scriptName = "AuthMethodsReport" 
 $scriptOutput = New-Object System.Collections.Generic.List[PSCustomObject]
 
 # Konfigurasi File Input (Pastikan file ini ada di folder yang sama dengan skrip)

@@ -4,7 +4,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "Export_ATP_Mail_Traffic_Report" 
+$scriptName = "ATPMailTrafficReport" 
 $scriptOutput = @() 
 
 # Tentukan jalur dan nama file output dinamis

@@ -5,7 +5,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "GetEntraGroups" 
+$scriptName = "AllGroupsReport" 
 $scriptOutput = New-Object System.Collections.Generic.List[PSCustomObject]
 
 # Tentukan jalur dan nama file output dinamis

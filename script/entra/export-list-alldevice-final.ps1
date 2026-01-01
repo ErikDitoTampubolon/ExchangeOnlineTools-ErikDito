@@ -5,8 +5,8 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "ExportDuplicateEntraDevices" # Nama skrip untuk file output
-$scriptOutput = @() # Array tempat semua data hasil skrip dikumpulkan
+$scriptName = "DuplicateDevicesReport"
+$scriptOutput = @()
 
 # Tentukan jalur dan nama file output dinamis
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"

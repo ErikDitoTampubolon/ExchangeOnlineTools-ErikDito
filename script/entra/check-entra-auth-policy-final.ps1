@@ -5,7 +5,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "GetEntraAuthPolicy" 
+$scriptName = "EntraAuthPolicyReport" 
 $scriptOutput = @() 
 
 # Tentukan jalur dan nama file output dinamis

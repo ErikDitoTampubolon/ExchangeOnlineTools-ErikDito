@@ -10,7 +10,7 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $inputFilePath = Join-Path -Path $scriptDir -ChildPath $inputFileName
 
 # Variabel Global dan Output
-$scriptName = "BulkAutoPasswordReset" 
+$scriptName = "AutoPasswordResetReport" 
 $scriptOutput = [System.Collections.ArrayList]::new() 
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"

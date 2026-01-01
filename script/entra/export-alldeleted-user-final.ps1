@@ -5,7 +5,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "ExportEntraDeletedUsers" 
+$scriptName = "DeletedUsersReport" 
 $scriptOutput = [System.Collections.ArrayList]::new() 
 
 # Tentukan jalur dan nama file output dinamis

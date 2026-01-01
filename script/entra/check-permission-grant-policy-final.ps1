@@ -5,7 +5,7 @@
 # =========================================================================
 
 # Variabel Global dan Output
-$scriptName = "GetPermissionGrantPolicies" 
+$scriptName = "PermissionGrantPoliciesReport" 
 $scriptOutput = [System.Collections.ArrayList]::new() 
 
 # Tentukan jalur dan nama file output dinamis
