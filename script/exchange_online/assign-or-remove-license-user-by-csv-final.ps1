@@ -35,7 +35,6 @@ if ($confirmation -ne "Y") {
     return
 }
 
-
 ## -----------------------------------------------------------------------
 ## 2. KONEKSI KE MICROSOFT GRAPH (SILENT MODE)
 ## -----------------------------------------------------------------------
@@ -58,6 +57,7 @@ if (Get-MgContext -ErrorAction SilentlyContinue) {
 ## -----------------------------------------------------------------------
 ## 3. PEMILIHAN OPERASI DAN LISENSI 
 ## -----------------------------------------------------------------------
+
 Write-Host "`n--- 3. Pemilihan Operasi ---" -ForegroundColor Blue
 $operationChoice = Read-Host "Pilih operasi: (1) Assign License | (2) Remove License"
 
