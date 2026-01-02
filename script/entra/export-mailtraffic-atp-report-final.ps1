@@ -13,72 +13,9 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $PSScriptRoot -ChildPath $outputFileName
 
-
-## -----------------------------------------------------------------------
-## 1. PRASYARAT DAN INSTALASI MODUL
-## -----------------------------------------------------------------------
-
-Write-Host "--- 1. Memeriksa dan Menyiapkan Lingkungan PowerShell ---" -ForegroundColor Blue
-
-# 1.1. Mengatur Execution Policy
-Write-Host "1.1. Mengatur Execution Policy ke RemoteSigned..." -ForegroundColor Cyan
-try {
-    Set-ExecutionPolicy RemoteSigned -Scope Process -Force -ErrorAction Stop
-    Write-Host " Execution Policy berhasil diatur." -ForegroundColor Green
-} catch {
-    Write-Error "Gagal mengatur Execution Policy: $($_.Exception.Message)"
-    exit 1
-}
-
-# 1.2. Fungsi Pembantu untuk Cek dan Instal Modul
-function CheckAndInstallModule {
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$ModuleName
-    )
-
-    Write-Host "1.$(++$global:moduleStep). Memeriksa Modul '$ModuleName'..." -ForegroundColor Cyan
-
-    if (Get-Module -Name $ModuleName -ListAvailable) {
-        Write-Host " Modul '$ModuleName' sudah terinstal. Melewati instalasi." -ForegroundColor Green
-    } else {
-        Write-Host " Modul '$ModuleName' belum ditemukan. Memulai instalasi..." -ForegroundColor Yellow
-        try {
-            Install-Module -Name $ModuleName -Force -AllowClobber -Scope CurrentUser -ErrorAction Stop
-            Write-Host " Modul '$ModuleName' berhasil diinstal." -ForegroundColor Green
-        } catch {
-            Write-Error "Gagal menginstal modul '$ModuleName'. Pastikan PowerShellGet sudah terinstal dan koneksi internet tersedia."
-            exit 1
-        }
-    }
-}
-
-$global:moduleStep = 1
-CheckAndInstallModule -ModuleName "PowerShellGet"
-CheckAndInstallModule -ModuleName "ExchangeOnlineManagement"
-
-## -----------------------------------------------------------------------
-## 2. KONEKSI WAJIB (EXCHANGE ONLINE)
-## -----------------------------------------------------------------------
-
-Write-Host "`n--- 2. Membangun Koneksi ke Exchange Online ---" -ForegroundColor Blue
-
-if (-not (Get-PSSession | Where-Object {$_.ConfigurationName -eq "Microsoft.Exchange"})) {
-    Write-Host "Menghubungkan ke Exchange Online. Anda mungkin diminta untuk login..." -ForegroundColor Yellow
-    try {
-        Connect-ExchangeOnline -ShowProgress $false -ErrorAction Stop | Out-Null
-        Write-Host "Koneksi ke Exchange Online berhasil dibuat." -ForegroundColor Green
-    } catch {
-        Write-Error "Gagal terhubung ke Exchange Online. $($_.Exception.Message)"
-        exit 1
-    }
-} else {
-    Write-Host "Sesi Exchange Online sudah aktif. Melewati koneksi ulang." -ForegroundColor Green
-}
-
-## -----------------------------------------------------------------------
-## 3. LOGIKA UTAMA SCRIPT
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                          LOGIKA UTAMA SCRIPT
+## ==========================================================================
 
 Write-Host "`n--- 3. Memulai Logika Utama Skrip: $($scriptName) ---" -ForegroundColor Magenta
 
@@ -113,9 +50,9 @@ try {
     Write-Host "   Gagal mengambil laporan ATP: $($_.Exception.Message)" -ForegroundColor Red
 }
 
-## -----------------------------------------------------------------------
-## 4. EKSPOR HASIL
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                              EKSPOR HASIL
+## ==========================================================================
 
 if ($scriptOutput.Count -gt 0) {
     # 1. Tentukan nama folder

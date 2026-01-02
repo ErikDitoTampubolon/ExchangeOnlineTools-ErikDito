@@ -13,9 +13,10 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
-# ==========================================================
-#                INFORMASI SCRIPT                
-# ==========================================================
+## ==========================================================================
+#                           INFORMASI SCRIPT                
+## ==========================================================================
+
 Write-Host "`n================================================" -ForegroundColor Yellow
 Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
 Write-Host "================================================" -ForegroundColor Yellow
@@ -28,9 +29,10 @@ Write-Host " Field Kolom       : [AccountEnabled]
 Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil semua data perangkat dari Microsoft Entra ID, termasuk status aktif, ID perangkat, sistem operasi, estimasi waktu terakhir sign-in, serta nama tampilan perangkat. Hasil laporan ditampilkan di konsol dan diekspor otomatis ke file CSV." -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Yellow
 
-# ==========================================================
-# KONFIRMASI EKSEKUSI
-# ==========================================================
+## ==========================================================================
+#                        KONFIRMASI EKSEKUSI
+## ==========================================================================
+
 $confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
 
 if ($confirmation -ne "Y") {
@@ -38,9 +40,9 @@ if ($confirmation -ne "Y") {
     return
 }
 
-## -----------------------------------------------------------------------
-## 2. KONEKSI WAJIB (MICROSOFT ENTRA)
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                  KONEKSI WAJIB (MICROSOFT ENTRA)
+## ==========================================================================
 
 Write-Host "`n--- 2. Membangun Koneksi ke Microsoft Entra ---" -ForegroundColor Blue
 
@@ -60,9 +62,9 @@ try {
 }
 
 
-## -----------------------------------------------------------------------
-## 3. LOGIKA UTAMA SCRIPT
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                          LOGIKA UTAMA SCRIPT
+## ==========================================================================
 
 Write-Host "`n--- 3. Memulai Logika Utama Skrip: $($scriptName) ---" -ForegroundColor Magenta
 
@@ -84,9 +86,9 @@ try {
     Write-Error "Terjadi kesalahan saat mengambil data perangkat: $($_.Exception.Message)"
 }
 
-## -----------------------------------------------------------------------
-## 4. EKSPOR HASIL
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                               EKSPOR HASIL
+## ==========================================================================
 
 if ($scriptOutput.Count -gt 0) {
     # 1. Tentukan nama folder

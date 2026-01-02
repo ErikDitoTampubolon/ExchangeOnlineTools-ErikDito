@@ -16,9 +16,10 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
-# ==========================================================
-#                INFORMASI SCRIPT                
-# ==========================================================
+## ==========================================================================
+#                           INFORMASI SCRIPT                
+## ==========================================================================
+
 Write-Host "`n================================================" -ForegroundColor Yellow
 Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
 Write-Host "================================================" -ForegroundColor Yellow
@@ -31,9 +32,10 @@ Write-Host " Field Kolom       : [Timestamp]
 Write-Host " Deskripsi Singkat : Script ini berfungsi untuk melakukan reset password massal pada pengguna Microsoft Entra ID dengan password acak yang digenerate otomatis oleh sistem. Password baru dicatat dalam laporan CSV bersama status eksekusi dan pesan hasil." -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Yellow
 
-# ==========================================================
-# KONFIRMASI EKSEKUSI
-# ==========================================================
+## ==========================================================================
+#                           KONFIRMASI EKSEKUSI
+## ==========================================================================
+
 $confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
 
 if ($confirmation -ne "Y") {
@@ -41,9 +43,9 @@ if ($confirmation -ne "Y") {
     return
 }
 
-## -----------------------------------------------------------------------
-## 2. FUNGSI GENERATOR PASSWORD & KONEKSI
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                  FUNGSI GENERATOR PASSWORD & KONEKSI
+## ==========================================================================
 
 # Fungsi untuk membuat password acak 12 karakter yang aman
 function Generate-RandomPassword {
@@ -67,9 +69,9 @@ try {
     exit 1
 }
 
-## -----------------------------------------------------------------------
-## 3. LOGIKA UTAMA SCRIPT
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                          LOGIKA UTAMA SCRIPT
+## ==========================================================================
 
 Write-Host "`n--- 3. Memulai Proses Reset Password Otomatis ---" -ForegroundColor Magenta
 
@@ -120,9 +122,9 @@ if (Test-Path $inputFilePath) {
     Write-Host "ERROR: File '$inputFileName' tidak ditemukan!" -ForegroundColor Red
 }
 
-## -----------------------------------------------------------------------
-## 4. EKSPOR HASIL
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                              EKSPOR HASIL
+## ==========================================================================
 
 if ($scriptOutput.Count -gt 0) {
     # 1. Tentukan nama folder

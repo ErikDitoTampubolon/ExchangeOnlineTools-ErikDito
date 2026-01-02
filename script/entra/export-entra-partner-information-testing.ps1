@@ -14,42 +14,9 @@ $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 
-
-## -----------------------------------------------------------------------
-## 1. PRASYARAT DAN INSTALASI MODUL
-## -----------------------------------------------------------------------
-
-Write-Host "--- 1. Memeriksa dan Menyiapkan Lingkungan PowerShell ---" -ForegroundColor Blue
-
-# 1.1. Mengatur Execution Policy
-Write-Host "1.1. Mengatur Execution Policy ke RemoteSigned..." -ForegroundColor Cyan
-try {
-    Set-ExecutionPolicy RemoteSigned -Scope Process -Force -ErrorAction Stop
-    Write-Host " Execution Policy berhasil diatur." -ForegroundColor Green
-} catch {
-    Write-Error "Gagal mengatur Execution Policy: $($_.Exception.Message)"
-    exit 1
-}
-
-# 1.2. Fungsi Pembantu untuk Cek dan Instal Modul
-function CheckAndInstallModule {
-    param([string]$ModuleName)
-    Write-Host "1.$(++$global:moduleStep). Memeriksa Modul '$ModuleName'..." -ForegroundColor Cyan
-    if (Get-Module -Name $ModuleName -ListAvailable) {
-        Write-Host " Modul '$ModuleName' sudah terinstal." -ForegroundColor Green
-    } else {
-        Write-Host " Modul '$ModuleName' belum ditemukan. Menginstal..." -ForegroundColor Yellow
-        Install-Module -Name $ModuleName -Force -AllowClobber -Scope CurrentUser -ErrorAction Stop
-    }
-}
-
-$global:moduleStep = 1
-CheckAndInstallModule -ModuleName "PowerShellGet"
-CheckAndInstallModule -ModuleName "Microsoft.Entra"
-
-## -----------------------------------------------------------------------
-## 2. KONEKSI WAJIB (MICROSOFT ENTRA)
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                  KONEKSI WAJIB (MICROSOFT ENTRA)
+## ==========================================================================
 
 Write-Host "`n--- 2. Membangun Koneksi ke Microsoft Entra ---" -ForegroundColor Blue
 
@@ -62,9 +29,9 @@ try {
     exit 1
 }
 
-## -----------------------------------------------------------------------
-## 3. LOGIKA UTAMA SCRIPT
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                          LOGIKA UTAMA SCRIPT
+## ==========================================================================
 
 Write-Host "`n--- 3. Memulai Logika Utama Skrip: $($scriptName) ---" -ForegroundColor Magenta
 
@@ -97,9 +64,9 @@ try {
     Write-Error "Terjadi kesalahan: $($_.Exception.Message)"
 }
 
-## -----------------------------------------------------------------------
-## 4. EKSPOR HASIL
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                          EKSPOR HASIL
+## ==========================================================================
 
 if ($scriptOutput.Count -gt 0) {
     # 1. Tentukan nama folder

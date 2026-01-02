@@ -12,9 +12,10 @@ $scriptOutput = [System.Collections.Generic.List[PSCustomObject]]::new()
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 
-# ==========================================================
-#                INFORMASI SCRIPT                
-# ==========================================================
+## ==========================================================================
+#                           INFORMASI SCRIPT                
+## ==========================================================================
+
 Write-Host "`n================================================" -ForegroundColor Yellow
 Write-Host "                INFORMASI SCRIPT                " -ForegroundColor Yellow
 Write-Host "================================================" -ForegroundColor Yellow
@@ -29,9 +30,10 @@ Write-Host " Field Kolom       : [DisplayName]
 Write-Host " Deskripsi Singkat : Script ini berfungsi untuk mengambil daftar Guest User di Microsoft Entra ID yang tidak aktif lebih dari 30 hari. Laporan mencakup informasi DisplayName, UPN, tipe user, status akun, serta detail aktivitas sign-in terakhir. Hasil laporan ditampilkan di konsol dengan progres bar dan diekspor otomatis ke file CSV." -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Yellow
 
-# ==========================================================
-# KONFIRMASI EKSEKUSI
-# ==========================================================
+## ==========================================================================
+#                           KONFIRMASI EKSEKUSI
+## ==========================================================================
+
 $confirmation = Read-Host "Apakah Anda ingin menjalankan skrip ini? (Y/N)"
 
 if ($confirmation -ne "Y") {
@@ -39,9 +41,9 @@ if ($confirmation -ne "Y") {
     return
 }
 
-## -----------------------------------------------------------------------
-## 2. KONEKSI WAJIB (MICROSOFT ENTRA)
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                   KONEKSI WAJIB (MICROSOFT ENTRA)
+## ==========================================================================
 
 Write-Host "`n--- 2. Membangun Koneksi ke Microsoft Entra ---" -ForegroundColor Blue
 
@@ -55,9 +57,9 @@ try {
     exit 1
 }
 
-## -----------------------------------------------------------------------
-## 3. LOGIKA UTAMA SCRIPT
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                           LOGIKA UTAMA SCRIPT
+## ==========================================================================
 
 Write-Host "`n--- 3. Memulai Logika Utama Skrip ---" -ForegroundColor Magenta
 
@@ -97,9 +99,9 @@ try {
     Write-Error "Terjadi kesalahan saat mengambil data: $($_.Exception.Message)"
 }
 
-## -----------------------------------------------------------------------
-## 4. EKSPOR HASIL
-## -----------------------------------------------------------------------
+## ==========================================================================
+##                              EKSPOR HASIL
+## ==========================================================================
 
 if ($scriptOutput.Count -gt 0) {
     Write-Host "`n--- 4. Mengekspor Hasil ---" -ForegroundColor Blue
