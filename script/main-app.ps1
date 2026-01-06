@@ -71,7 +71,7 @@ function Test-ScriptIntegrity {
 Clear-Host
 Test-ScriptIntegrity
 
-# --- 1. Memeriksa Lingkungan PowerShell ---
+# --- Memeriksa Lingkungan PowerShell ---
 Set-ExecutionPolicy RemoteSigned -Scope Process -Force -ErrorAction SilentlyContinue
 
 function Check-Module {
@@ -85,16 +85,16 @@ function Check-Module {
     }
 }
 
-Write-Host "--- 1. Prasyarat Modul ---" -ForegroundColor Blue
+Write-Host "--- Prasyarat Modul ---" -ForegroundColor Blue
 Check-Module -ModuleName "PowerShellGet"
 Check-Module -ModuleName "ExchangeOnlineManagement"
 Check-Module -ModuleName "Microsoft.Graph"
 Check-Module -ModuleName "Microsoft.Entra"
 Check-Module -ModuleName "Microsoft.Entra.Beta"
 
-# --- 2. Membangun Koneksi Multi-Service ---
+# --- Membangun Koneksi Multi-Service ---
 $requiredScopes = "User.ReadWrite.All", "Organization.Read.All"
-Write-Host "`n--- 2. Membangun Koneksi ke Microsoft Graph ---" -ForegroundColor Blue
+Write-Host "`n--- Membangun Koneksi ke Microsoft Graph ---" -ForegroundColor Blue
 
 if (Get-MgContext -ErrorAction SilentlyContinue) {
     Write-Host "Sesi Graph yang ada akan diputus untuk koneksi ulang dengan scopes baru." -ForegroundColor DarkYellow
@@ -146,6 +146,7 @@ Start-Sleep -Seconds 1
 ## -----------------------------------------------------------------------
 ## FUNGSI HEADER DENGAN ASCII ART
 ## -----------------------------------------------------------------------
+
 function Show-Header {
     Clear-Host
     $ascii = @'
@@ -171,6 +172,7 @@ function Show-Header {
 ## -----------------------------------------------------------------------
 ## LOGIKA EKSEKUSI LOOP
 ## -----------------------------------------------------------------------
+
 $mainRunning = $true
 while ($mainRunning) {
     Show-Header
