@@ -7,9 +7,9 @@
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
 if ([string]::IsNullOrWhiteSpace($scriptDir)) { $scriptDir = "." }
 
-# --- 0. FUNGSI PEMERIKSAAN INTEGRITAS FILE ---
+# --- PEMERIKSAAN INTEGRITAS FILE ---
 function Test-ScriptIntegrity {
-    Write-Host "--- 0. Memeriksa Integritas File Aplikasi ---" -ForegroundColor Blue
+    Write-Host "--- Memeriksa Integritas File Aplikasi ---" -ForegroundColor Blue
     
     # Daftar semua file yang harus ada
     $requiredScripts = @(
