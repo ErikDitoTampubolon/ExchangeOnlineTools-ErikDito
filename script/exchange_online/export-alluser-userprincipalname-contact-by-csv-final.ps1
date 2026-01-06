@@ -10,12 +10,15 @@ $scriptOutput = [System.Collections.ArrayList]::new()
 $global:moduleStep = 1
 
 # Konfigurasi File Input
-$inputFileName = "UserPrincipalName.csv"
+$inputFileName = "daftar_email.csv"
 
 # Tentukan jalur dan nama file output dinamis
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$scriptDir = if ($PSScriptRoot) {$PSScriptRoot} else {(Get-Location).Path}
-$inputFilePath = Join-Path -Path $scriptDir -ChildPath $inputFileName
+$scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
+
+$parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+$inputFilePath = Join-Path -Path $parentDir -ChildPath $inputFileName
+
 $outputFileName = "Output_$($scriptName)_$($timestamp).csv"
 $outputFilePath = Join-Path -Path $scriptDir -ChildPath $outputFileName
 

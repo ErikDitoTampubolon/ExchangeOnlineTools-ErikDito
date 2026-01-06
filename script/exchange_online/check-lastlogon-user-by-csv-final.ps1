@@ -5,11 +5,13 @@
 # Variabel Global dan Output
 $scriptName = "MailboxLastLogonByCSVReport" 
 $scriptOutput = @() 
-$inputFileName = "UserPrincipalName.csv"
+$inputFileName = "daftar_email.csv"
 
 # Penanganan Jalur Aman (Fix: Empty Path Error)
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
-$inputFilePath = Join-Path -Path $scriptDir -ChildPath $inputFileName
+
+$parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+$inputFilePath = Join-Path -Path $parentDir -ChildPath $inputFileName
 
 # Tentukan jalur output
 $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
