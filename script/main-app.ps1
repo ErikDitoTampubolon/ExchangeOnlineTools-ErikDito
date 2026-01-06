@@ -23,6 +23,7 @@ function Test-ScriptIntegrity {
         "script\exchange_online\check-mailbox-storage-user-by-csv-final.ps1",
         "script\exchange_online\check-lastlogon-user-by-csv-final.ps1",
         "script\exchange_online\check-transport-rules-final.ps1",
+        "script\exchange_online\export-onedrive-user-by-csv-final.ps1",
         "script\entra\enable-or-disable-mfa-user-by-csv-final.ps1",
         "script\entra\force-password-change-alluser-by-csv-final.ps1",
         "script\entra\export-alluser-mfa-final.ps1",
@@ -198,6 +199,7 @@ while ($mainRunning) {
                 Write-Host "  8. Export List Mailbox Storage Usage by .csv"
                 Write-Host "  9. Export List Active User Last Logon by .csv"
                 Write-Host "  10. Export List Transport Rules"
+                Write-Host "  11. Export List OneDrive Usage"
                 Write-Host ""
                 Write-Host "  B. Kembali ke Menu Utama" -ForegroundColor Yellow
                 Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
@@ -214,6 +216,7 @@ while ($mainRunning) {
                 elseif ($subChoice -eq "8") { & (Join-Path $scriptDir "script\exchange_online\check-mailbox-storage-user-by-csv-final.ps1"); Pause }
                 elseif ($subChoice -eq "9") { & (Join-Path $scriptDir "script\exchange_online\check-lastlogon-user-by-csv-final.ps1"); Pause }
                 elseif ($subChoice -eq "10") { & (Join-Path $scriptDir "script\exchange_online\check-transport-rules-final.ps1"); Pause }
+                elseif ($subChoice -eq "11") { & (Join-Path $scriptDir "script\exchange_online\export-onedrive-user-by-csv-final.ps1"); Pause }
             }
         }
         "2" { 
