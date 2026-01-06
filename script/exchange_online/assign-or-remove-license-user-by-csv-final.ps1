@@ -4,12 +4,16 @@
 # ==========================================================================
 
 # 1. Konfigurasi File Input & Path
-$inputFileName = "UserPrincipalName.csv"
+$inputFileName = "daftar_email.csv"
+
+# Ambil lokasi script saat ini
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
-$inputFilePath = Join-Path -Path $scriptDir -ChildPath $inputFileName
+
+$parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
+$inputFilePath = Join-Path -Path $parentDir -ChildPath $inputFileName
 
 $defaultUsageLocation = 'ID'
-$operationType = "" 
+$operationType = ""
 
 # ==========================================================================
 #                               INFORMASI SCRIPT                
