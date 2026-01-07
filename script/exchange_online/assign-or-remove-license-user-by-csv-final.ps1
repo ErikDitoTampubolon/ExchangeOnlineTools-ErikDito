@@ -3,17 +3,58 @@
 # AUTHOR: Erik Dito Tampubolon
 # ==========================================================================
 
-# 1. Konfigurasi File Input & Path
-$inputFileName = "daftar_email.csv"
-
 # Ambil lokasi script saat ini
 $scriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }
-
 $parentDir = (Get-Item $scriptDir).Parent.Parent.FullName
-$inputFilePath = Join-Path -Path $parentDir -ChildPath $inputFileName
-
 $defaultUsageLocation = 'ID'
 $operationType = ""
+
+# ==========================================================================
+#                    DETEKSI DAN PEMILIHAN FILE CSV
+# ==========================================================================
+
+Write-Host "`n--- Mencari file CSV di: $parentDir ---" -ForegroundColor Blue
+
+# Mencari semua file .csv di folder 2 tingkat di atas script
+$csvFiles = Get-ChildItem -Path $parentDir -Filter "*.csv"
+
+if ($csvFiles.Count -eq 0) {
+    Write-Host "[!] Tidak ditemukan file CSV di direktori: $parentDir" -ForegroundColor Red
+    return
+}
+
+Write-Host "File CSV yang ditemukan:" -ForegroundColor Yellow
+for ($i = 0; $i -lt $csvFiles.Count; $i++) {
+    Write-Host "$($i + 1). $($csvFiles[$i].Name)" -ForegroundColor Cyan
+}
+
+# Meminta pengguna memilih file
+$fileChoice = Read-Host "`nPilih nomor file CSV yang ingin digunakan"
+
+# Validasi input
+if (-not ($fileChoice -as [int]) -or [int]$fileChoice -lt 1 -or [int]$fileChoice -gt $csvFiles.Count) {
+    Write-Host "[!] Pilihan tidak valid. Skrip dibatalkan." -ForegroundColor Red
+    return
+}
+
+# Set variabel input berdasarkan pemilihan
+$selectedFile = $csvFiles[[int]$fileChoice - 1]
+$inputFilePath = $selectedFile.FullName
+$inputFileName = $selectedFile.Name
+
+# --- PENAMBAHAN LOGIKA HITUNG TOTAL EMAIL ---
+try {
+    # Import sementara untuk menghitung jumlah baris (menggunakan header TempColumn agar baris 1 terhitung)
+    $tempData = Import-Csv -Path $inputFilePath -Header "TempColumn" -ErrorAction Stop
+    $totalEmail = $tempData.Count
+    
+    Write-Host "`n[OK] File Terpilih: $inputFileName" -ForegroundColor Green
+    Write-Host "[INFO] Total email yang terdeteksi: $totalEmail email" -ForegroundColor Cyan
+    Write-Host "----------------------------------------------------------"
+} catch {
+    Write-Host "[!] Gagal membaca file CSV: $($_.Exception.Message)" -ForegroundColor Red
+    return
+}
 
 # ==========================================================================
 #                               INFORMASI SCRIPT                
@@ -100,7 +141,7 @@ try {
 ## ==========================================================================
 
 $allResults = @()
-$timestamp = Get-Date -Format "yyyyMMdd_HHmm"
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 
 if (-not (Test-Path -Path $inputFilePath)) {
     Write-Host "File ${inputFileName} tidak ditemukan di ${scriptDir}!" -ForegroundColor Red

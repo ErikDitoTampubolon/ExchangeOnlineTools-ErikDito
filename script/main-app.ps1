@@ -240,14 +240,17 @@ while ($mainRunning) {
                 Write-Host "  12. Export List Permission Grant Policy"
                 Write-Host "  13. Export List Entra Auth Policy"
                 Write-Host "  14. Export List Entra Identity Provider"
+                Write-Host "  15. Export List All Group"
+                Write-Host "  16. Export List All Domain"
+                Write-Host "  17. Export List Mail Traffic ATP"
                 Write-Host ""
                 Write-Host "  B. Kembali ke Menu Utama" -ForegroundColor Yellow
                 Write-Host "---------------------------------------------" -ForegroundColor DarkCyan
                 
                 $subChoice = Read-Host "Pilih nomor menu"
                 if ($subChoice.ToUpper() -eq "B") { $subRunning = $false }
-	elseif ($subChoice -eq "1") { & (Join-Path $scriptDir "script\entra\enable-or-disable-mfa-user-by-csv-final.ps1"); Pause }
-	elseif ($subChoice -eq "2") { & (Join-Path $scriptDir "script\entra\force-password-change-alluser-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "1") { & (Join-Path $scriptDir "script\entra\enable-or-disable-mfa-user-by-csv-final.ps1"); Pause }
+                elseif ($subChoice -eq "2") { & (Join-Path $scriptDir "script\entra\force-password-change-alluser-by-csv-final.ps1"); Pause }
                 elseif ($subChoice -eq "3") { & (Join-Path $scriptDir "script\entra\export-alluser-mfa-final.ps1"); Pause }
                 elseif ($subChoice -eq "4") { & (Join-Path $scriptDir "script\entra\export-alldevice-final.ps1"); Pause }
                 elseif ($subChoice -eq "5") { & (Join-Path $scriptDir "script\entra\export-alluser-owned-device-final.ps1"); Pause }
@@ -260,6 +263,9 @@ while ($mainRunning) {
                 elseif ($subChoice -eq "12") { & (Join-Path $scriptDir "script\entra\check-permission-grant-policy-final.ps1"); Pause }
                 elseif ($subChoice -eq "13") { & (Join-Path $scriptDir "script\entra\check-entra-auth-policy-final.ps1"); Pause }
                 elseif ($subChoice -eq "14") { & (Join-Path $scriptDir "script\entra\check-entra-identity-provider-final.ps1"); Pause }
+                elseif ($subChoice -eq "15") { & (Join-Path $scriptDir "script\entra\export-allgroup-final.ps1"); Pause }
+                elseif ($subChoice -eq "16") { & (Join-Path $scriptDir "script\entra\export-domain-final.ps1"); Pause }
+                elseif ($subChoice -eq "17") { & (Join-Path $scriptDir "script\entra\export-mailtraffic-atp-report-final.ps1"); Pause }
             }
         }
         "10" {
